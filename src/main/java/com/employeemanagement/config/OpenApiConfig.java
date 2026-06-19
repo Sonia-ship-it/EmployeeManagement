@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Swagger / OpenAPI configuration.
  *
- * <p>Access the interactive API docs at: <a href="http://localhost:8080/swagger-ui.html">/swagger-ui.html</a></p>
- * <p>After login, click Authorize and enter: {@code Bearer &lt;your-jwt-token&gt;}</p>
+ * <p>Access the interactive API docs at: http://localhost:8080/swagger-ui.html</p>
+ * <p>After login, click Authorize and enter: Bearer &lt;your-jwt-token&gt;</p>
  */
 @Configuration
 @OpenAPIDefinition(
@@ -26,3 +26,16 @@ import org.springframework.context.annotation.Configuration;
         )
 )
 public class OpenApiConfig {
+
+    @Bean
+    public OpenAPI openAPI() {
+        return new OpenAPI()
+                .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
+                .components(new Components().addSecuritySchemes("Bearer Authentication",
+                        new SecurityScheme()
+                                .name("Bearer Authentication")
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("bearer")
+                                .bearerFormat("JWT")));
+    }
+}

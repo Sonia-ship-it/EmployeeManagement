@@ -21,3 +21,27 @@ import java.sql.Connection;
 @RequiredArgsConstructor
 @Slf4j
 public class DatabaseRoutineInitializer {
+
+    private static final String STATEMENT_SEPARATOR = ";;";
+
+    private final DataSource dataSource;
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void installRoutines() {
+        try (Connection connection = dataSource.getConnection()) {
+            ScriptUtils.executeSqlScript(
+                    connection,
+                    new EncodedResource(new ClassPathResource("db/routines.sql")),
+                    false,
+                    false,
+                    ScriptUtils.DEFAULT_COMMENT_PREFIX,
+                    STATEMENT_SEPARATOR,
+                    ScriptUtils.DEFAULT_BLOCK_COMMENT_START_DELIMITER,
+                    ScriptUtils.DEFAULT_BLOCK_COMMENT_END_DELIMITER
+            );
+            log.info("PostgreSQL payroll routines installed successfully");
+        } catch (Exception ex) {
+            log.error("Could not install DB routines", ex);
+        }
+    }
+}
